@@ -1,0 +1,43 @@
+[settings]
+ignore = [
+  "vendor/**",
+  "generated/**",
+]
+
+[[group]]
+name = "core"
+description = "Primary implementation"
+include = [
+  "src/**/domain/**",
+  "src/**/application/**",
+]
+
+[[group]]
+name = "architecture"
+description = "Architectural implementation and design documentation"
+include = [
+  "src/**/runtime/**",
+  "src/**/persistence/**",
+  "docs/architecture/**",
+]
+
+[[group]]
+name = "critical"
+description = "Code whose failure can invalidate persistence, safety, or release guarantees"
+include = [
+  "src/**/runtime_safety/**",
+  "src/**/persistence/**",
+]
+
+[[group]]
+name = "critical-tests"
+include = [
+  "tests/test_*_safety.py",
+  "tests/test_runtime_*.py",
+]
+
+[[group]]
+name = "operations-docs"
+include = [
+  "docs/operations/**",
+]
