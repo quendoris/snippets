@@ -1,0 +1,11 @@
+id = "app-screenshotter"
+name = "App Screenshotter"
+version = "0.1.0"
+status = "experimental"
+category = "visual-evidence"
+language = "python"
+entrypoint = "src/app_screenshotter.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["png", "json-manifest"]
+requires = ["Python >= 3.11", "PySide6 >= 6.8"]
