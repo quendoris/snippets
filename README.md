@@ -128,10 +128,15 @@ It collects explicit files/directories below a declared base, inventories source
 
 The current contract deliberately rejects symlinks, strips original timestamps/permissions to normalized archive metadata, and favors deterministic evidence over compression ratio.
 
+### [`app-screenshotter`](app-screenshotter/)
+
+Experimental `0.1.0` PySide6 in-process visual-evidence primitive.
+
+It captures caller-selected Qt widgets or visible top-level widgets through `QWidget.grab()`, publishes PNGs through temporary-file replacement, and records geometry, device-pixel ratio, Qt/platform metadata and PNG SHA-256 in a JSON manifest. It intentionally owns neither application navigation nor redaction and does not pretend to be a generic operating-system screenshot utility.
+
 ## Planned snippets
 
-- `app-screenshotter` — reusable capture/manifest/archive primitives extracted from real visual-audit workflows;
-- possible later candidates include reproducible gate orchestration and configurable typing-suppression auditing after their project-specific policy is separated cleanly.
+Possible later candidates include reproducible gate orchestration, configurable typing-suppression auditing, and pinned-asset vendoring after their project-specific policy and provenance contracts are separated cleanly.
 
 ## Licensing
 
