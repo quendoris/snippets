@@ -120,10 +120,17 @@ It separates:
 
 Python receives token/AST-aware line accounting. Other supported programming languages currently use a documented comment-stripped estimate rather than pretending to be parser-exact. JSON output exposes per-file evidence and Git metadata when available.
 
+### [`archive-bundler`](archive-bundler/)
+
+Experimental `0.1.0` deterministic artifact packager.
+
+It collects explicit files/directories below a declared base, inventories source bytes with SHA-256, rechecks bytes during archive construction, and publishes a normalized `ZIP_STORED` archive containing generated JSON/Markdown evidence under `_bundle/`.
+
+The current contract deliberately rejects symlinks, strips original timestamps/permissions to normalized archive metadata, and favors deterministic evidence over compression ratio.
+
 ## Planned snippets
 
 - `app-screenshotter` — reusable capture/manifest/archive primitives extracted from real visual-audit workflows;
-- `archive-bundler` — deterministic artifact collection with inventory, hashes, metadata, and archive output;
 - possible later candidates include reproducible gate orchestration and configurable typing-suppression auditing after their project-specific policy is separated cleanly.
 
 ## Licensing
