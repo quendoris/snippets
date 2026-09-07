@@ -107,11 +107,24 @@ only then consider consuming the snippet from the original project
 
 A release-critical project-local tool is **not** removed merely because a generalized version now exists here. Migration happens only after the reusable snippet has its own stable contract and verification.
 
-## First planned snippets
+## Current snippets
 
-- `codebase-anatomy` — language-aware code/documentation/test accounting with explicit semantic repository groups;
+### [`codebase-anatomy`](codebase-anatomy/)
+
+Experimental `0.1.0` repository-anatomy analyzer extracted conceptually from Persona Training Lab's `tools/codebase_stats.py`.
+
+It separates:
+
+- automatic facts such as language, physical/nonblank lines, code-line method/value, bytes and structural role;
+- explicit project-declared semantic groups such as `core`, `architecture`, `critical`, or `critical-tests`.
+
+Python receives token/AST-aware line accounting. Other supported programming languages currently use a documented comment-stripped estimate rather than pretending to be parser-exact. JSON output exposes per-file evidence and Git metadata when available.
+
+## Planned snippets
+
 - `app-screenshotter` — reusable capture/manifest/archive primitives extracted from real visual-audit workflows;
-- `archive-bundler` — deterministic artifact collection with inventory, hashes, metadata, and archive output.
+- `archive-bundler` — deterministic artifact collection with inventory, hashes, metadata, and archive output;
+- possible later candidates include reproducible gate orchestration and configurable typing-suppression auditing after their project-specific policy is separated cleanly.
 
 ## Licensing
 
