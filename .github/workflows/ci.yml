@@ -28,12 +28,16 @@ jobs:
         run: |
           python -m compileall -q codebase-anatomy/src codebase-anatomy/tests
           python -m compileall -q archive-bundler/src archive-bundler/tests
+          python -m compileall -q typing-suppression-audit/src typing-suppression-audit/tests
 
       - name: Test codebase anatomy
         run: python -m unittest discover -s codebase-anatomy/tests -p "test_*.py" -v
 
       - name: Test archive bundler
         run: python -m unittest discover -s archive-bundler/tests -p "test_*.py" -v
+
+      - name: Test typing suppression audit
+        run: python -m unittest discover -s typing-suppression-audit/tests -p "test_*.py" -v
 
       - name: Install Qt runtime for screenshotter
         run: python -m pip install "PySide6>=6.8,<7"
