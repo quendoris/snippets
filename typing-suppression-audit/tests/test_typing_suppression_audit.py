@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-import importlib.util
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
 
-MODULE_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "src"
-    / "typing_suppression_audit.py"
-)
-SPEC = importlib.util.spec_from_file_location("typing_suppression_audit", MODULE_PATH)
-assert SPEC is not None and SPEC.loader is not None
-MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(MODULE)
+SRC = Path(__file__).resolve().parents[1] / "src"
+sys.path.insert(0, str(SRC))
+
+import typing_suppression_audit as audit  # noqa: E402
 
 
 class TypingSuppressionAuditTests(unittest.TestCase):
@@ -29,7 +24,7 @@ class TypingSuppressionAuditTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            findings = MODULE.scan(
+            findings = audit.scan(
                 root=root,
                 code_roots=(Path("src"),),
                 config_paths=(),
@@ -40,30 +35,30 @@ class TypingSuppressionAuditTests(unittest.TestCase):
             self.assertEqual(findings[0].line, 2)
 
     def test_default_policy_blocks_every_finding(self) -> None:
-        finding = MODULE.Finding(
+        finding = audit.Finding(
             path="tests/test_sample.py",
             line=4,
             kind="type_ignore",
             text="# type: ignore[arg-type]",
         )
-        classified = MODULE.classify((finding,))
+        classified = audit.classify((finding,))
         self.assertEqual(len(classified), 1)
         self.assertTrue(classified[0].blocking)
 
     def test_explicit_test_prefix_can_downgrade_only_coded_ignore(self) -> None:
-        coded = MODULE.Finding(
+        coded = audit.Finding(
             path="tests/test_sample.py",
             line=4,
             kind="type_ignore",
             text="# type: ignore[arg-type]",
         )
-        broad = MODULE.Finding(
+        broad = audit.Finding(
             path="tests/test_sample.py",
             line=5,
             kind="type_ignore",
             text="# type: ignore",
         )
-        classified = MODULE.classify(
+        classified = audit.classify(
             (coded, broad),
             informational_coded_ignore_prefixes=("tests/",),
         )
@@ -78,7 +73,7 @@ class TypingSuppressionAuditTests(unittest.TestCase):
                 "[mypy-package.*]\nignore_errors = true\n",
                 encoding="utf-8",
             )
-            findings = MODULE.scan(
+            findings = audit.scan(
                 root=root,
                 code_roots=(),
                 config_paths=(Path("mypy.ini"),),
@@ -88,18 +83,18 @@ class TypingSuppressionAuditTests(unittest.TestCase):
 
     def test_payload_counts_blocking_and_informational(self) -> None:
         findings = (
-            MODULE.ClassifiedFinding(
-                MODULE.Finding("src/a.py", 1, "type_ignore", "# type: ignore"),
+            audit.ClassifiedFinding(
+                audit.Finding("src/a.py", 1, "type_ignore", "# type: ignore"),
                 True,
             ),
-            MODULE.ClassifiedFinding(
-                MODULE.Finding(
+            audit.ClassifiedFinding(
+                audit.Finding(
                     "tests/a.py", 2, "type_ignore", "# type: ignore[arg-type]"
                 ),
                 False,
             ),
         )
-        report = MODULE.payload(findings)
+        report = audit.payload(findings)
         self.assertFalse(report["passed"])
         self.assertEqual(report["finding_count"], 2)
         self.assertEqual(report["blocking_finding_count"], 1)
