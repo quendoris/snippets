@@ -134,6 +134,12 @@ Experimental `0.1.0` PySide6 in-process visual-evidence primitive.
 
 It captures caller-selected Qt widgets or visible top-level widgets through `QWidget.grab()`, publishes PNGs through temporary-file replacement, and records geometry, device-pixel ratio, Qt/platform metadata and PNG SHA-256 in a JSON manifest. It intentionally owns neither application navigation nor redaction and does not pretend to be a generic operating-system screenshot utility.
 
+### [`page-evidence-batcher`](page-evidence-batcher/)
+
+Experimental `0.1.0` page-aligned evidence exporter extracted from the Corpus Motuum editorial workflow.
+
+It selects a contiguous sequence of manifest records, verifies source SHA-256 values, copies each source page together with any number of caller-declared evidence layers, emits a project-neutral JSON manifest, and builds a metadata-normalized deterministic `tar.gz`. Evidence layers are intentionally generic: the snippet knows nothing about OCR engines or which layer, if any, is authoritative.
+
 ## Planned snippets
 
 Possible later candidates include reproducible gate orchestration, configurable typing-suppression auditing, and pinned-asset vendoring after their project-specific policy and provenance contracts are separated cleanly.
