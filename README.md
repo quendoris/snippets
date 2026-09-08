@@ -134,9 +134,19 @@ Experimental `0.1.0` PySide6 in-process visual-evidence primitive.
 
 It captures caller-selected Qt widgets or visible top-level widgets through `QWidget.grab()`, publishes PNGs through temporary-file replacement, and records geometry, device-pixel ratio, Qt/platform metadata and PNG SHA-256 in a JSON manifest. It intentionally owns neither application navigation nor redaction and does not pretend to be a generic operating-system screenshot utility.
 
+### [`typing-suppression-audit`](typing-suppression-audit/)
+
+Experimental `0.1.0` Python typing-suppression inventory extracted from Persona Training Lab's release tooling.
+
+It tokenizes Python comments to detect `# type: ignore` and file-level mypy directives without matching marker-looking strings, inventories configuration-level suppression assignments, and emits deterministic text or JSON evidence. The reusable version deliberately removes Persona Training Lab's implicit test policy: every finding blocks by default, while narrow coded ignores can be downgraded only through an explicit path-prefix option.
+
 ## Planned snippets
 
-Possible later candidates include reproducible gate orchestration, configurable typing-suppression auditing, and pinned-asset vendoring after their project-specific policy and provenance contracts are separated cleanly.
+The next candidates being extracted are:
+
+- a project-agnostic `release-gate-runner` distilled from Persona Training Lab's reproducible release audit orchestration;
+- a `pinned-asset-vendor` distilled from exact-commit, exact-byte vendoring used for Noto assets;
+- localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly.
 
 ## Licensing
 
