@@ -146,11 +146,16 @@ Experimental `0.1.0` manifest-driven release/audit orchestrator extracted from P
 
 It keeps the reusable mechanics — optional clean-Git precondition, seed/runtime metadata, exact argv execution without shell parsing, repeated checks, blocking versus informational failures, streamed per-step logs and JSON/Markdown evidence — while moving project-specific Ruff/mypy/pytest/i18n/build composition into a TOML manifest owned by the consuming project.
 
+### [`pinned-asset-vendor`](pinned-asset-vendor/)
+
+Experimental `0.1.0` exact-byte HTTPS asset vendor distilled from Persona Training Lab's pinned Noto asset workflow.
+
+A manifest binds each destination to an exact HTTPS source URL, byte count and SHA-256, with optional Git blob SHA-1 provenance. Vendor mode skips already-correct assets, verifies downloaded bytes before and after temporary-file publication, and atomically replaces the destination. `--check` is a strictly local verification path and never acquires missing bytes.
+
 ## Planned snippets
 
 The next candidates are:
 
-- a `pinned-asset-vendor` distilled from exact-commit, exact-byte vendoring used for Noto assets;
 - localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly;
 - additional small algorithms or audit helpers only when a real project-local implementation provides concrete behavior to extract.
 
