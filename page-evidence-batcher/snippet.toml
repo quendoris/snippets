@@ -1,0 +1,10 @@
+id = "page-evidence-batcher"
+name = "Page Evidence Batcher"
+version = "0.1.0"
+status = "experimental"
+category = "artifacts"
+language = "python"
+entrypoint = "src/page_evidence_batcher.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["directory", "tar.gz", "json-manifest"]
