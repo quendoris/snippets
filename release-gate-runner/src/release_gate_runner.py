@@ -190,8 +190,6 @@ def collect_metadata(root: Path, *, seed: int, config_path: Path) -> dict[str, o
 
 
 def _expand(value: str, variables: Mapping[str, str]) -> str:
-    # str.format_map gives concise explicit placeholders while preserving argv
-    # boundaries. Unknown placeholders are configuration errors, not empty text.
     try:
         return value.format_map(variables)
     except KeyError as error:
@@ -356,9 +354,10 @@ class ReleaseGateRunner:
                     process.wait()
                     raise RuntimeError(f"failed to capture output for step {step.name}")
                 try:
-                    for line in stdout:
-                        print(line, end="")
-                        log.write(line)
+                    with stdout:
+                        for line in stdout:
+                            print(line, end="")
+                            log.write(line)
                 except KeyboardInterrupt:
                     process.terminate()
                     try:
