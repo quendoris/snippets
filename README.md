@@ -140,13 +140,19 @@ Experimental `0.1.0` Python typing-suppression inventory extracted from Persona 
 
 It tokenizes Python comments to detect `# type: ignore` and file-level mypy directives without matching marker-looking strings, inventories configuration-level suppression assignments, and emits deterministic text or JSON evidence. The reusable version deliberately removes Persona Training Lab's implicit test policy: every finding blocks by default, while narrow coded ignores can be downgraded only through an explicit path-prefix option.
 
+### [`release-gate-runner`](release-gate-runner/)
+
+Experimental `0.1.0` manifest-driven release/audit orchestrator extracted from Persona Training Lab's release gate.
+
+It keeps the reusable mechanics — optional clean-Git precondition, seed/runtime metadata, exact argv execution without shell parsing, repeated checks, blocking versus informational failures, streamed per-step logs and JSON/Markdown evidence — while moving project-specific Ruff/mypy/pytest/i18n/build composition into a TOML manifest owned by the consuming project.
+
 ## Planned snippets
 
-The next candidates being extracted are:
+The next candidates are:
 
-- a project-agnostic `release-gate-runner` distilled from Persona Training Lab's reproducible release audit orchestration;
 - a `pinned-asset-vendor` distilled from exact-commit, exact-byte vendoring used for Noto assets;
-- localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly.
+- localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly;
+- additional small algorithms or audit helpers only when a real project-local implementation provides concrete behavior to extract.
 
 ## Licensing
 
