@@ -1,0 +1,10 @@
+id = "typing-suppression-audit"
+name = "Typing Suppression Audit"
+version = "0.1.0"
+status = "experimental"
+category = "analysis"
+language = "python"
+entrypoint = "src/typing_suppression_audit.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["text", "json", "exit-code"]
