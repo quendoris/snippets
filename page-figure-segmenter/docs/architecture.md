@@ -2,191 +2,232 @@
 
 ## 1. Boundary of the reusable unit
 
-The snippet accepts a scanned page image and estimates one or more illustration regions. It owns segmentation geometry and confidence/evidence. It does **not** own OCR, semantic figure recognition, book-specific caption parsing, page-number interpretation, exercise schemas, or publication layout.
+The snippet accepts a scanned page image and estimates one or more illustration assets together with auditable geometry/masks. It owns page-local measurement, seed evidence, graph growth, asset grouping, renderable-support masks and alpha geometry. It does **not** own OCR, semantic figure recognition, book-specific caption parsing, exercise schemas or publication layout.
 
-The source image is immutable evidence. Every derived region is described in source-page coordinates so a caller can regenerate or audit every output.
+The source image is immutable evidence. Every derived asset is described in source-page coordinates so a caller can regenerate or audit it.
+
+This architecture is axiom-first: failed exploratory behavior has no compatibility status. If an implementation contradicts the invariants below, the implementation is replaced rather than the invariant weakened to protect legacy code.
 
 ## 2. Core invariants
 
-1. **No fixed pixel geometry.** Distances, gap tolerances, margins and feather widths are expressed using page-derived scale observables.
-2. **Seeds are evidence, not final regions.** A large or statistically non-text component establishes a high-confidence starting point; it does not define the entire illustration.
-3. **Weak connected support may be recovered.** Broken historical strokes may be joined when the path from a strong seed is cheap in normalized geometric cost.
-4. **Ordinary text is expensive to traverse.** A nearby word or paragraph must not be absorbed merely because it touches or approaches a figure.
-5. **Interior fill must be justified.** Open drawings remain open unless closing observed contour gaps is sufficiently cheap.
-6. **Segmentation never whitens the source.** Paper luminance, stains and weak print inside an accepted region remain source evidence.
-7. **Only the outer alpha boundary is softened.** The historical strokes themselves are not blurred as part of extraction.
-8. **Page classification precedes page-scale estimation.** Cover-like, nearly blank, full-tone, or otherwise non-text-page inputs must not be forced through a text-scale model that is inapplicable.
+1. **No fixed pixel geometry.** Distances, gaps, margins and feather widths are expressed using page-derived scale observables.
+2. **Seeds are evidence, not assets.** A statistically non-text component establishes a starting point; it never receives final asset identity merely because it is a seed.
+3. **Growth ownership is not rendering permission.** A component may be traversed by a graph path to establish connectivity without becoming opaque figure support.
+4. **Asset grouping precedes crop emission.** Raw seed families are never exported directly as independent images. Nested, overlapping or otherwise strongly related families must first be resolved into asset candidates.
+5. **Every asset owns its own support mask.** Cropping a page-wide union mask by an asset rectangle is forbidden because it can import support owned by another asset.
+6. **Ordinary text is expensive to traverse and harder still to render.** Nearby words or bleed-through may not become figure ink merely because growth reached them.
+7. **Interior paper and observed ink are separate layers.** Justified enclosed paper is opaque even when it contains no foreground stroke; observed figure support remains a distinct mask.
+8. **Interior fill must be justified.** Open drawings remain open unless closing observed contour gaps is sufficiently cheap.
+9. **Source evidence and publication cleanup are separate derivatives.** A clean publication asset must never overwrite or masquerade as the evidence-preserving derivative.
+10. **Only the outer alpha boundary is softened.** Historical strokes themselves are not blurred as part of extraction.
+11. **Page classification precedes text-scale estimation.** Inputs outside the calibrated body-page domain must fail closed or use a separately calibrated mode.
+12. **No probability claim without a supported probability model.** Robust scores may rank outliers, but a Gaussian tail, p-value or false-positive probability may not be inferred unless its assumptions are validated.
 
 ## 3. Page observables
 
-Let `L(x,y)` be source luminance and `B(x,y)` a slowly varying estimate of the local paper field. Define a local ink response
+Let `L(x,y)` be source luminance and `B(x,y)` a slowly varying estimate of the local paper field. Define local ink response
 
 `I(x,y) = max(B(x,y) - L(x,y), 0)`.
 
-A foreground-support mask is derived from `I`. Connected components are then measured by at least:
+A foreground-support mask is derived from `I`. Connected components retain at least:
 
 - bounding-box width `w(c)` and height `h(c)`;
 - foreground area `A(c)`;
 - spatial extent `e(c) = max(w(c), h(c))`;
 - centroid and source-page position;
 - local stroke-width evidence;
-- neighborhood relations to other components.
+- neighborhood relations.
 
-The dominant text population is used to estimate two page-local units:
+The high-confidence text population estimates two page-local units:
 
-- `H_cap`: robust characteristic full-height text / capital scale;
+- `H_cap`: robust characteristic full-height text/capital scale;
 - `W_stroke`: robust characteristic printed-stroke width.
 
-These observables are not assumed to be globally constant across scans, resolutions, books, or rerendered fallback pages.
+These observables are measured per page and are not assumed constant across scans, resolutions, books or rerendered pages.
 
 ### 3.1 Failure-resistant text-scale estimation
 
-The estimator must reject tiny specks and bleed-through fragments as candidate text modes. A useful architecture is:
+The estimator must reject dust and bleed-through fragments as candidate text modes. A viable architecture is:
 
-1. classify page type from global luminance/foreground statistics;
-2. find candidate component-height modes above a scale-relative dust floor;
-3. score candidates by both component frequency and line-like neighborhood support;
+1. classify page domain from global image statistics;
+2. establish a scale-relative dust floor;
+3. score candidate component-height modes using both frequency and line/baseline support;
 4. estimate `H_cap` from the selected text band;
-5. estimate `W_stroke` from distance-transform samples inside high-confidence text components.
+5. estimate `W_stroke` from distance-transform evidence inside high-confidence text components.
 
-This is deliberately stronger than selecting the raw mode of all component heights: degraded scans can contain more 2–4 px fragments than actual characters.
+A raw mode over all connected-component heights is explicitly insufficient for degraded scans.
 
-## 4. Text-likeness as a local property
+## 4. Text-likeness is local evidence
 
-A component is not text merely because it has text-like dimensions. Figure fragments can have the same size as letters.
+A component is not text merely because it has text-like dimensions; figure fragments can share the same dimensions as letters.
 
-Define a local text-likeness score `T(c) ∈ [0,1]` using evidence such as:
+Define `T(c) ∈ [0,1]` from evidence such as:
 
-- similarity of `h(c)`, `w(c)` and area to the page's text population;
-- nearby components with similar height;
-- horizontal/baseline alignment;
-- bilateral support from neighbors to the left and right;
-- repeated small gaps characteristic of words or text lines.
+- size similarity to the page text population;
+- nearby components of similar height;
+- baseline/horizontal alignment;
+- bilateral neighbors;
+- repeated small gaps characteristic of words and lines.
 
-The score is used as a **traversal penalty**, not as a destructive text-removal mask. This distinction matters where a figure and a paragraph share the same vertical band.
+`T(c)` has two distinct roles:
+
+- a **growth/traversal penalty**;
+- one input to the stricter **renderable-support decision**.
+
+Those roles must not be collapsed. A graph may cross a dubious bridge without painting that bridge into the final PNG.
 
 ## 5. Strong seeds
 
-For component `c`, a reusable normalized feature vector may contain
+For component `c`, a normalized feature vector may include
 
 `f(c) = [log(h/H_cap), log(e/H_cap), log(A/(H_cap·W_stroke))]`.
 
-Seed significance is evaluated relative to a robust model of **high-confidence text components**, not every small foreground component. This matters on pages with bleed-through: background artifacts must not broaden the reference distribution until a real illustration ceases to look exceptional.
+Seed extremeness is evaluated relative to high-confidence text components, not every small component on the page. The reference distribution must therefore survive bleed-through and dust.
 
-A strong seed should combine statistical extremeness with low local text-likeness. Exceptionally extreme components may survive a moderate text-likeness score; ordinary heading/caption glyphs should not.
+The default statistical interpretation is empirical/robust until a parametric distribution has been validated. Median/MAD, empirical tail quantiles or another declared robust outlier model are acceptable; an unsupported normal-tail conversion is not.
 
-Border-touching scan artifacts receive a separate penalty or rejection rule when their geometry indicates page-edge noise rather than an illustration.
-
-The seed detector should expose a per-page false-seed budget or an equivalent calibrated tail criterion rather than a hidden magic threshold.
+A strong seed combines extremeness with sufficiently low text-likeness. Border artifacts are treated separately rather than by a universal “thin line = not figure” rule because genuine ropes, poles and rails are also thin.
 
 ## 6. Component graph
 
-Create a graph `G = (V,E)` where each foreground component is a node. Edges connect components whose bounding boxes or support pixels are close enough in normalized page units.
+Create graph `G=(V,E)` where nodes are foreground components and edges represent plausible normalized spatial continuation.
 
-A provisional edge cost can be decomposed as
+A provisional edge cost may be decomposed as
 
 `C(u,v) = C_gap(u,v) + λ_text·T(v) + C_artifact(v) + C_context(u,v)`.
 
-Where:
+`C_gap` uses `W_stroke`/`H_cap`; other terms remain dimensionless calibration parameters.
 
-- `C_gap` is a geometric gap measured in units of `W_stroke` and optionally `H_cap`;
-- `T(v)` is local text-likeness;
-- `C_artifact` penalizes tiny dust chains, page-border noise and other weak support;
-- `C_context` may encode continuation/orientation evidence when validated.
-
-The coefficients are dimensionless calibration parameters.
+Spatial indexing is an optimization only. It must not change graph semantics: candidate-neighbor discovery must be based on component support/bounding boxes, not merely centroid proximity, otherwise a long rail and a short fragment close to its endpoint can be missed despite having a small true geometric gap.
 
 ## 7. Multi-source geodesic growth
 
-Run bounded multi-source shortest-path growth from all accepted seeds.
+Run bounded multi-source shortest-path growth from accepted seeds.
 
-A component belongs to a candidate region only if the minimum cumulative path cost from some seed is below the calibrated growth budget. This has two desired consequences:
+Growth establishes **ownership/reachability**, not final support. It is permitted to cross a small amount of uncertain evidence when this is needed to connect a broken drawing. Repeated ordinary-text penalties must make paths into paragraphs progressively expensive.
 
-- a broken line can be recovered through one or more very small geometric gaps;
-- entering a line of ordinary letters accumulates repeated text penalties and stops before a paragraph is consumed.
+Seed ownership is retained so collisions and ambiguous areas are explicit rather than silently merged.
 
-Seed ownership should be retained. Candidate regions that meet can then be treated explicitly rather than silently merged.
+## 8. Seed-family regions
 
-## 8. Candidate-region filtering
+Each seed owner yields an initial family/region. Region evidence can include:
 
-Bleed-through can produce statistically unusual but isolated components. Therefore seed existence alone is insufficient.
+- total normalized area;
+- maximum extent;
+- seed strength/count;
+- continuity;
+- fraction of text-like traversal;
+- border contact.
 
-After growth, score each seed family / candidate region using normalized evidence such as:
+Seed existence alone never implies asset acceptance.
 
-- total observed foreground area;
-- maximum spatial extent;
-- number and strength of mutually supporting seeds;
-- continuity of the grown support;
-- fraction of high-text-likeness components;
-- contact with suspicious page borders.
+## 9. Asset grouping
 
-A thin rope may have low area but large extent. A compact human drawing may have high area. Region acceptance must therefore be multi-feature rather than a single area threshold.
+This is a separate stage from graph growth and support recovery.
 
-## 9. Closure and interior fill
+Raw seed families are hypotheses. Before any crop is emitted, decide whether families are:
 
-The original intuitive rule "mostly enclosed" is represented as a closure-cost problem.
+- different parts of the same illustration;
+- duplicate/nested views of the same support;
+- truly distinct neighboring illustrations.
 
-For a grown candidate region:
+Grouping may use intersection/nesting, normalized axis gaps, orthogonal overlap, continuation/orientation evidence and later calibrated structural evidence. It must be evaluated explicitly for false splits and false merges.
 
-1. provisionally close only gaps on a scale `k_close·W_stroke` (or another calibrated page-relative scale);
-2. flood-fill from the page exterior;
-3. identify newly enclosed interior;
-4. measure the amount and geometry of artificial support required to create that enclosure;
-5. accept the interior only when the closure cost is below the calibrated budget.
+The output of this stage is the first object allowed to receive a stable **asset identity**.
 
-This prevents the empty space between neighboring illustrations from being filled merely because both happen to border the same background area. An open illustration remains valid; it simply receives no unjustified interior fill.
+## 10. Renderable support
 
-## 10. Final mask and outer margin
+For a grouped asset candidate, derive an asset-specific observed-support mask.
 
-After accepted support and justified interior are combined, expand the region by a small page-relative outer margin, for example
+A component reachable during graph growth is included only when independent support evidence justifies rendering it. Examples of reasons to retain support include:
+
+- membership in a strong seed/core;
+- sufficiently large/extended figure-like geometry;
+- close support continuity to the core;
+- validated orientation/stroke continuation.
+
+Examples of reasons to omit support include:
+
+- isolated normal-sized glyph geometry outside the figure core;
+- high text-likeness reached only as a bridge;
+- weak bleed-through fragments with no structural support;
+- page-edge artifacts.
+
+This stage is what prevents “the algorithm crossed the letter, therefore the letter appears in the PNG.”
+
+## 11. Closure and interior paper
+
+The intuitive “mostly enclosed” idea is represented as a closure-cost problem.
+
+For an asset-specific support mask:
+
+1. provisionally close only small scale-relative gaps;
+2. flood-fill from a guaranteed exterior (use a padded exterior, not an unverified source corner);
+3. identify candidate enclosed paper;
+4. measure artificial bridge support/topology required to create that enclosure;
+5. accept interior only below a calibrated closure budget.
+
+Observed ink support and accepted interior paper remain separate masks. Interior paper may be opaque even though it is not figure ink.
+
+## 12. Margin and alpha
+
+Combine observed support with justified interior, then add a small scale-relative margin such as
 
 `r_margin = k_margin·W_stroke`.
 
-The purpose is to retain ambiguous weak edge pixels and local paper context without reaching into neighboring text.
-
-A signed-distance field or equivalent boundary-distance map is then used to construct a soft alpha boundary over
+Construct outer alpha feather over
 
 `r_alpha = k_alpha·W_stroke`.
 
-The interior remains opaque.
+The interior remains opaque. Feathering acts on the outer mask boundary only.
 
-## 11. Archival rendering
+## 13. Evidence-preserving versus clean rendering
 
-The segmentation stage returns geometry/masks; rendering policy is caller-controlled. The intended archival use case is:
+A robust implementation should be able to emit at least two derivatives from the same geometry.
 
-- crop the original source pixels;
-- remove chroma / desaturate if desired;
-- preserve source luminance inside the mask;
-- apply only the outer alpha mask;
-- encode the canonical derivative losslessly, typically as PNG with alpha.
+### 13.1 Source-preserving derivative
 
-No inpainting, whitening, sharpening, redrawing or smoothing of historical strokes is implied by this architecture.
+- grayscale/desaturated source pixels;
+- accepted alpha geometry;
+- original source luminance retained for audit, including historical paper irregularity and any source contamination inside the accepted region.
 
-## 12. Calibration model
+### 13.2 Publication-clean derivative
 
-A parameter vector `θ` contains only global **dimensionless** coefficients: seed-tail budget, text penalty, growth budget, closure scale, closure budget, margin scale, alpha width and any later validated context terms.
+- observed figure strokes still come from source pixels;
+- accepted paper-only interior may come from a slow local paper-field estimate `B(x,y)` rather than reverse-side text or unrelated foreground;
+- no redrawing/sharpening/invented stroke content;
+- same traceable source coordinates and masks.
 
-Optimization requires ground truth. A representative pilot should contain manual reference masks/regions and difficult negatives. One possible declared loss is
+The clean derivative is not evidence and must not replace the source-preserving derivative.
 
-`L(θ) = λ_miss E_missed_stroke + λ_text E_text_intrusion + λ_boundary E_boundary + λ_merge E_false_merge + λ_split E_false_split + λ_fp E_false_figure`.
+## 14. Calibration model
 
-The weights are part of the application policy and must be published with the fitted model. Page-level bootstrap or another resampling procedure should quantify parameter/result stability before a parameter set is frozen.
+A parameter vector `θ` contains global dimensionless coefficients: seed criterion, text penalty, growth budget, grouping limits, support criteria, closure scale/budget, margin scale, alpha width and any validated context terms.
 
-## 13. Evidence and reproducibility
+Optimization requires independent ground truth. A representative pilot must include manual source-coordinate masks/regions and difficult negatives. One possible declared loss is
 
-For each processed page the implementation should be able to emit:
+`L(θ) = λ_miss E_missed_stroke + λ_text E_text_intrusion + λ_boundary E_boundary + λ_merge E_false_merge + λ_split E_false_split + λ_fp E_false_figure + λ_fill E_false_fill`.
 
-- page-type decision and observables;
-- `H_cap` and `W_stroke`;
-- component table or a reproducible digest thereof;
-- seed list and scores;
-- text-likeness scores needed to audit unexpected growth;
-- graph/growth parameters and model version;
-- candidate-region scores;
-- closure cost;
-- hard and soft masks;
-- bounding boxes in source coordinates;
+Calibration and held-out validation must be separate. Caption count or successful visual examples are QA signals, not a substitute for mask-level validation.
+
+## 15. Evidence and reproducibility
+
+For each processed page/asset the implementation should be able to emit:
+
+- page-domain decision and observables;
+- `H_cap`, `W_stroke`;
+- component evidence or reproducible digest;
+- seed list/scores and statistical method;
+- text-likeness;
+- graph/growth parameters;
+- raw seed-family identities;
+- grouping decisions;
+- asset-specific observed-support mask;
+- closure/interior mask and cost;
+- hard/soft alpha;
+- source bounding box;
+- source-preserving and clean derivative metadata;
 - debug overlays;
-- source SHA-256 when supplied by the caller.
+- source SHA-256 when supplied/available.
 
-The same source bytes, implementation version and frozen model parameters should produce the same segmentation outputs.
+The same source bytes, implementation version and frozen parameter set should produce the same outputs.
