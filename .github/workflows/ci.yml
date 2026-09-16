@@ -51,6 +51,13 @@ jobs:
       - name: Test pinned asset vendor
         run: python -m unittest discover -s pinned-asset-vendor/tests -p "test_*.py" -v
 
+      - name: Test HTTP resume policy
+        run: |
+          g++ -std=c++20 -Wall -Wextra -Wpedantic -Werror \
+            http-resume-policy/tests/test_http_resume_policy.cpp \
+            -o /tmp/http-resume-policy-test
+          /tmp/http-resume-policy-test
+
       - name: Install Qt runtime for screenshotter
         run: |
           sudo apt-get update
