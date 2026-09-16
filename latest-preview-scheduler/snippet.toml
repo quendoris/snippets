@@ -1,0 +1,10 @@
+id = "latest-preview-scheduler"
+name = "Latest Preview Scheduler"
+version = "0.1.0"
+status = "experimental"
+category = "concurrency"
+language = "cpp"
+entrypoint = "src/latest_preview_scheduler.hpp"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["library"]
