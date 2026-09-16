@@ -39,7 +39,7 @@ The pending preview slot is cleared. The running generation is invalidated and t
 
 ## Completion transitions
 
-`complete(generation, quality)` accepts a completion only when work is currently marked running and the supplied generation equals the current generation.
+`complete(generation)` accepts a completion only when work is currently marked running and the supplied generation equals the current generation. The scheduler already owns the active request quality; callers do not resubmit it at completion time.
 
 A stale completion returns `accepted = false` and cannot launch more work.
 
@@ -57,4 +57,5 @@ An accepted completion without such a pending preview leaves the scheduler idle.
 - A later preview replaces an older pending preview.
 - A verified request cannot be followed by an older pending preview.
 - A completion from an invalidated generation cannot mutate scheduling state.
+- Completion behavior uses the internally recorded quality of the active launch.
 - Every launch gets a generation distinct from the generation it preempted.
