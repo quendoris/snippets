@@ -1,0 +1,10 @@
+id = "release-gate-runner"
+name = "Release Gate Runner"
+version = "0.1.0"
+status = "experimental"
+category = "release"
+language = "python"
+entrypoint = "src/release_gate_runner.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["text", "json", "markdown", "logs", "exit-code"]

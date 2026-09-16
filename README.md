@@ -140,9 +140,31 @@ Experimental `0.1.0` page-aligned evidence exporter extracted from the Corpus Mo
 
 It selects a contiguous sequence of manifest records, verifies source SHA-256 values, copies each source page together with any number of caller-declared evidence layers, emits a project-neutral JSON manifest, and builds a metadata-normalized deterministic `tar.gz`. Evidence layers are intentionally generic: the snippet knows nothing about OCR engines or which layer, if any, is authoritative.
 
+### [`typing-suppression-audit`](typing-suppression-audit/)
+
+Experimental `0.1.0` Python typing-suppression inventory extracted from Persona Training Lab's release tooling.
+
+It tokenizes Python comments to detect `# type: ignore` and file-level mypy directives without matching marker-looking strings, inventories configuration-level suppression assignments, and emits deterministic text or JSON evidence. The reusable version deliberately removes Persona Training Lab's implicit test policy: every finding blocks by default, while narrow coded ignores can be downgraded only through an explicit path-prefix option.
+
+### [`release-gate-runner`](release-gate-runner/)
+
+Experimental `0.1.0` manifest-driven release/audit orchestrator extracted from Persona Training Lab's release gate.
+
+It keeps the reusable mechanics — optional clean-Git precondition, seed/runtime metadata, exact argv execution without shell parsing, repeated checks, blocking versus informational failures, streamed per-step logs and JSON/Markdown evidence — while moving project-specific Ruff/mypy/pytest/i18n/build composition into a TOML manifest owned by the consuming project.
+
+### [`pinned-asset-vendor`](pinned-asset-vendor/)
+
+Experimental `0.1.0` exact-byte HTTPS asset vendor distilled from Persona Training Lab's pinned Noto asset workflow.
+
+A manifest binds each destination to an exact HTTPS source URL, byte count and SHA-256, with optional Git blob SHA-1 provenance. Vendor mode skips already-correct assets, verifies downloaded bytes before and after temporary-file publication, and atomically replaces the destination. `--check` is a strictly local verification path and never acquires missing bytes.
+
 ## Planned snippets
 
-Possible later candidates include reproducible gate orchestration, configurable typing-suppression auditing, and pinned-asset vendoring after their project-specific policy and provenance contracts are separated cleanly.
+The next candidates are:
+
+- reusable primitives extracted from AERIS development workflows where their project-specific assumptions can be cleanly separated;
+- localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly;
+- additional small algorithms or audit helpers only when a real project-local implementation provides concrete behavior to extract.
 
 ## Licensing
 
