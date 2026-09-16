@@ -164,6 +164,12 @@ Experimental `0.1.0` C++17 HTTP byte-range resume decision policy extracted from
 
 It parses the `Content-Range` start needed to prove append alignment and converts the local partial size plus HTTP response into an explicit `append`, `restart_from_zero`, `write_fresh`, or `reject` action. It also preserves AERIS's safe `416` rule: a local partial is accepted only when an independent integrity verifier already proves it is the complete expected object.
 
+### [`latest-preview-scheduler`](latest-preview-scheduler/)
+
+Experimental `0.1.0` C++17 scheduling state machine extracted from AERIS Desktop's scene controller.
+
+It bounds interactive pressure to one in-flight preview plus one newest pending preview instead of cancel/restarting or queueing every pointer update. Verified requests clear older pending previews and preempt stale work, while generation IDs reject late completions after cancellation or camera changes. The snippet owns only the policy; thread pools and cancellation tokens remain caller-controlled.
+
 ## Planned snippets
 
 The next candidates are:
