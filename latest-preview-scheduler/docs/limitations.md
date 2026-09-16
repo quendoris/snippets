@@ -16,9 +16,9 @@ Version `0.1.0` models the distinction that existed in AERIS: interactive previe
 
 This is deliberate coalescing. Every intermediate preview except the newest pending one may be dropped. Do not use this policy when every request represents a required side effect or durable transaction.
 
-## Caller supplies completion quality
+## Completion identity is only the generation
 
-The completion API receives the quality of the task that finished. The caller must preserve the launch metadata and return it with the same generation. The generation check protects against stale work, not malformed caller metadata.
+The scheduler records the quality of the active launch internally, so completion callers return only the generation. They must still preserve the generation that accompanied the launched request. Generation rejection protects scheduling state from stale results; it does not validate the semantic contents of a worker result.
 
 ## Generation wraparound
 
