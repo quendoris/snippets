@@ -58,6 +58,13 @@ jobs:
             -o /tmp/http-resume-policy-test
           /tmp/http-resume-policy-test
 
+      - name: Test latest preview scheduler
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror \
+            latest-preview-scheduler/tests/test_latest_preview_scheduler.cpp \
+            -o /tmp/latest-preview-scheduler-test
+          /tmp/latest-preview-scheduler-test
+
       - name: Install Qt runtime for screenshotter
         run: |
           sudo apt-get update
