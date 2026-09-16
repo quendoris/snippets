@@ -1,0 +1,10 @@
+id = "http-resume-policy"
+name = "HTTP Resume Policy"
+version = "0.1.0"
+status = "experimental"
+category = "networking"
+language = "cpp"
+entrypoint = "src/http_resume_policy.hpp"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["library"]
