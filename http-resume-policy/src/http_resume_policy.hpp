@@ -26,7 +26,9 @@ struct ResponseDecision final {
     const std::string_view header
 ) noexcept {
     constexpr std::string_view prefix{"bytes "};
-    if (!header.starts_with(prefix)) return std::nullopt;
+    if (header.size() < prefix.size() || header.substr(0, prefix.size()) != prefix) {
+        return std::nullopt;
+    }
 
     const std::size_t first = prefix.size();
     const std::size_t dash = header.find('-', first);
