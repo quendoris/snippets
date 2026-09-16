@@ -52,14 +52,11 @@ public:
         return {RequestAction::start, start(std::move(value), quality)};
     }
 
-    [[nodiscard]] CompletionDecision<Request> complete(
-        std::uint64_t generation,
-        Quality completed_quality
-    ) {
+    [[nodiscard]] CompletionDecision<Request> complete(std::uint64_t generation) {
         if (!running_ || generation != generation_) return {false, std::nullopt};
 
         running_ = false;
-        if (completed_quality == Quality::preview && pending_preview_) {
+        if (active_quality_ == Quality::preview && pending_preview_) {
             Request next = std::move(*pending_preview_);
             pending_preview_.reset();
             return {true, start(std::move(next), Quality::preview)};
