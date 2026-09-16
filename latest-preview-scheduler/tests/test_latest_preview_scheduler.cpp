@@ -24,7 +24,7 @@ int main() {
     assert(replaced.action == RequestAction::queue_latest_preview);
     assert(!replaced.launch.has_value());
 
-    const auto completed = scheduler.complete(first_generation, Quality::preview);
+    const auto completed = scheduler.complete(first_generation);
     assert(completed.accepted);
     assert(completed.next.has_value());
     assert(completed.next->request == "preview-3");
@@ -39,7 +39,7 @@ int main() {
     assert(verified_generation != latest_generation);
     assert(!scheduler.has_pending_preview());
 
-    const auto stale = scheduler.complete(latest_generation, Quality::preview);
+    const auto stale = scheduler.complete(latest_generation);
     assert(!stale.accepted);
     assert(!stale.next.has_value());
 
@@ -49,7 +49,7 @@ int main() {
     assert(interactive.launch->quality == Quality::preview);
     const auto interactive_generation = interactive.launch->generation;
 
-    const auto final = scheduler.complete(interactive_generation, Quality::preview);
+    const auto final = scheduler.complete(interactive_generation);
     assert(final.accepted);
     assert(!final.next.has_value());
     assert(!scheduler.running());
@@ -62,7 +62,7 @@ int main() {
     assert(!scheduler.running());
     assert(!scheduler.has_pending_preview());
     assert(scheduler.generation() != canceled_generation);
-    const auto after_cancel = scheduler.complete(canceled_generation, Quality::verified);
+    const auto after_cancel = scheduler.complete(canceled_generation);
     assert(!after_cancel.accepted);
 
     return 0;
