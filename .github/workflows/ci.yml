@@ -29,6 +29,9 @@ jobs:
           python -m compileall -q codebase-anatomy/src codebase-anatomy/tests
           python -m compileall -q archive-bundler/src archive-bundler/tests
           python -m compileall -q page-evidence-batcher/src page-evidence-batcher/tests
+          python -m compileall -q typing-suppression-audit/src typing-suppression-audit/tests
+          python -m compileall -q release-gate-runner/src release-gate-runner/tests
+          python -m compileall -q pinned-asset-vendor/src pinned-asset-vendor/tests
 
       - name: Test codebase anatomy
         run: python -m unittest discover -s codebase-anatomy/tests -p "test_*.py" -v
@@ -38,6 +41,15 @@ jobs:
 
       - name: Test page evidence batcher
         run: python -m unittest discover -s page-evidence-batcher/tests -p "test_*.py" -v
+
+      - name: Test typing suppression audit
+        run: python -m unittest discover -s typing-suppression-audit/tests -p "test_*.py" -v
+
+      - name: Test release gate runner
+        run: python -m unittest discover -s release-gate-runner/tests -p "test_*.py" -v
+
+      - name: Test pinned asset vendor
+        run: python -m unittest discover -s pinned-asset-vendor/tests -p "test_*.py" -v
 
       - name: Install Qt runtime for screenshotter
         run: |

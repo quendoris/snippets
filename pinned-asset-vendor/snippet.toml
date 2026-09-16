@@ -1,0 +1,10 @@
+id = "pinned-asset-vendor"
+name = "Pinned Asset Vendor"
+version = "0.1.0"
+status = "experimental"
+category = "integrity"
+language = "python"
+entrypoint = "src/pinned_asset_vendor.py"
+network_required = true
+platforms = ["linux", "windows", "macos"]
+outputs = ["text", "json", "files", "exit-code"]
