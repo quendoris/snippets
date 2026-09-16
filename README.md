@@ -158,11 +158,17 @@ Experimental `0.1.0` exact-byte HTTPS asset vendor distilled from Persona Traini
 
 A manifest binds each destination to an exact HTTPS source URL, byte count and SHA-256, with optional Git blob SHA-1 provenance. Vendor mode skips already-correct assets, verifies downloaded bytes before and after temporary-file publication, and atomically replaces the destination. `--check` is a strictly local verification path and never acquires missing bytes.
 
+### [`http-resume-policy`](http-resume-policy/)
+
+Experimental `0.1.0` C++17 HTTP byte-range resume decision policy extracted from AERIS Desktop's Natural Earth acquisition path.
+
+It parses the `Content-Range` start needed to prove append alignment and converts the local partial size plus HTTP response into an explicit `append`, `restart_from_zero`, `write_fresh`, or `reject` action. It also preserves AERIS's safe `416` rule: a local partial is accepted only when an independent integrity verifier already proves it is the complete expected object.
+
 ## Planned snippets
 
 The next candidates are:
 
-- reusable primitives extracted from AERIS development workflows where their project-specific assumptions can be cleanly separated;
+- additional reusable primitives extracted from AERIS development workflows where their project-specific assumptions can be cleanly separated;
 - localization/audit primitives only after their current dependency on Persona Training Lab's internal catalog model is separated cleanly;
 - additional small algorithms or audit helpers only when a real project-local implementation provides concrete behavior to extract.
 
