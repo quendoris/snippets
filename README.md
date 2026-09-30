@@ -170,6 +170,20 @@ Experimental `0.1.0` C++17 scheduling state machine extracted from AERIS Desktop
 
 It bounds interactive pressure to one in-flight preview plus one newest pending preview instead of cancel/restarting or queueing every pointer update. Verified requests clear older pending previews and preempt stale work, while generation IDs reject late completions after cancellation or camera changes. The snippet owns only the policy; thread pools and cancellation tokens remain caller-controlled.
 
+### [`github-actions-push-run-discovery`](github-actions-push-run-discovery/)
+
+Experimental `0.1.0` exact selector for push-triggered GitHub Actions runs.
+
+It was extracted from a connector-diagnostics exception where a high-level
+workflow helper exposed pull-request runs but omitted ordinary branch
+`push` runs. The reusable core consumes an already-acquired Actions
+`workflow_runs` JSON payload and requires an exact branch, workflow display
+name and full head SHA; ambiguous matches are rejected rather than silently
+choosing the newest run. Its documentation records the originating integration
+exception explicitly: generic connected GitHub GET is permitted only for
+read-only run discovery, after which specialized Actions job/step/log/artifact
+readers resume.
+
 ## Planned snippets
 
 The next candidates are:
