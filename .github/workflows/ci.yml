@@ -32,6 +32,7 @@ jobs:
           python -m compileall -q typing-suppression-audit/src typing-suppression-audit/tests
           python -m compileall -q release-gate-runner/src release-gate-runner/tests
           python -m compileall -q pinned-asset-vendor/src pinned-asset-vendor/tests
+          python -m compileall -q github-actions-push-run-discovery/src github-actions-push-run-discovery/tests
 
       - name: Test codebase anatomy
         run: python -m unittest discover -s codebase-anatomy/tests -p "test_*.py" -v
@@ -50,6 +51,9 @@ jobs:
 
       - name: Test pinned asset vendor
         run: python -m unittest discover -s pinned-asset-vendor/tests -p "test_*.py" -v
+
+      - name: Test GitHub Actions push-run discovery
+        run: python -m unittest discover -s github-actions-push-run-discovery/tests -p "test_*.py" -v
 
       - name: Test HTTP resume policy
         run: |
