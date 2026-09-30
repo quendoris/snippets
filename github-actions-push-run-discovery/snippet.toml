@@ -1,0 +1,11 @@
+id = "github-actions-push-run-discovery"
+name = "GitHub Actions Push Run Discovery"
+version = "0.1.0"
+status = "experimental"
+category = "diagnostics"
+language = "python"
+entrypoint = "src/push_run_discovery.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["text", "json", "exit-code"]
+requires = ["GitHub Actions workflow-runs JSON payload"]
