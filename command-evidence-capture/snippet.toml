@@ -1,0 +1,10 @@
+id = "command-evidence-capture"
+name = "Command Evidence Capture"
+version = "0.1.0"
+status = "experimental"
+category = "diagnostics"
+language = "python"
+entrypoint = "src/command_evidence_capture.py"
+network_required = false
+platforms = ["linux", "windows", "macos"]
+outputs = ["stdout-log", "stderr-log", "json", "exit-code"]

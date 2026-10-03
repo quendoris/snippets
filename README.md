@@ -146,6 +146,12 @@ Experimental `0.1.0` Python typing-suppression inventory extracted from Persona 
 
 It tokenizes Python comments to detect `# type: ignore` and file-level mypy directives without matching marker-looking strings, inventories configuration-level suppression assignments, and emits deterministic text or JSON evidence. The reusable version deliberately removes Persona Training Lab's implicit test policy: every finding blocks by default, while narrow coded ignores can be downgraded only through an explicit path-prefix option.
 
+### [`command-evidence-capture`](command-evidence-capture/)
+
+Experimental `0.1.0` single-command evidence wrapper extracted from long-running local solver/debug gates.
+
+It executes one exact argv command without shell interpretation, streams stdout and stderr live to their original terminal streams while preserving them in separate log files, and writes a compact JSON metadata record with timing, child exit status and available Git state. An explicit `--keep-shell` mode records a failing child while returning wrapper status 0 so interactive shells running with `set -e` do not disappear before the traceback can be inspected.
+
 ### [`release-gate-runner`](release-gate-runner/)
 
 Experimental `0.1.0` manifest-driven release/audit orchestrator extracted from Persona Training Lab's release gate.
