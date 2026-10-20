@@ -120,6 +120,10 @@ It separates:
 
 Python receives token/AST-aware line accounting. Other supported programming languages currently use a documented comment-stripped estimate rather than pretending to be parser-exact. JSON output exposes per-file evidence and Git metadata when available.
 
+### [`qar-authenticated-archive`](qar-authenticated-archive/)
+
+Experimental `0.1.0` offline authenticated, single-file archive tool extracted from the Biolam S-11 engineering conversation workflow. It encrypts an in-memory ZIP containing one source export using Argon2id and AES-256-GCM, creates a no-overwrite `.qar` file, and restores an authenticated ZIP without automatic extraction. It does not contain user passwords or private conversations. Linux verification and format/security caveats are documented.
+
 ### [`archive-bundler`](archive-bundler/)
 
 Experimental `0.1.0` deterministic artifact packager.
